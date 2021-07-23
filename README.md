@@ -1,2 +1,2 @@
 # Census-API-Map
-Using the Census API to create a map of the median household income by US county in ArcGIS Pro
+Extracting data from the Census API to create a map of the median household income by US geographies in ArcGIS Pro
