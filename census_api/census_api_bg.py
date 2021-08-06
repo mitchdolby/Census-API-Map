@@ -34,16 +34,18 @@ def main():
         print('Abbreviation is invalid')
         exit(0)
     response = requests.get(f"https://api.census.gov/data/2019/acs/acs5?get=NAME,GEO_ID,{args.var}&for=block%20group:*&in=state:{states[args.state.upper()]}&in=county:*&in=tract:*&key={api_key}")
-    #('Status Code: ', response.status_code) If the status code is 400 or any variant, print that it failed
+    if response.status_code == 400:
+        print('Status Code 400- request failed')
     result = json.loads(response.text)
     #write function that saves the data into a data folder, creates one smaller folder for each state
-    pd.DataFrame(result).to_csv(f'income_bg_{args.state.upper()}.csv')
-    df = pd.read_csv(f'income_bg_{args.state.upper()}.csv')
+    #change the names of the CSVs from 'income' to something more general (or args.var?)
+    pd.DataFrame(result).to_csv(f'{args.state.upper()}_bg.csv')
+    df = pd.read_csv(f'{args.state.upper()}_bg.csv')
     df = clean(df)
     if args.overwrite:
-        df.to_csv(f'income_bg_{args.state.upper()}.csv', index=False)
+        df.to_csv(f'{args.state.upper()}_bg.csv', index=False)
     else:
-        df.to_csv(f'income_bg_{args.state.upper()}_clean.csv', index=False)
+        df.to_csv(f'{args.state.upper()}_bg_clean.csv', index=False)
 
 if __name__ == '__main__':
     main()

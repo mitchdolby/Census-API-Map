@@ -1,3 +1,2 @@
-"""This config file contains the api key. You will need to request a key from the 
-census.gov/developers website."""
-api_key = 'INSERT_KEY_HERE' 
+#enter a census API key in the string
+api_key = 'fdd18dad5454b4090811a9c5e3f45c4dfdeb1b57' 
