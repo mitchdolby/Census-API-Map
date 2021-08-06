@@ -27,25 +27,37 @@ def main():
     parser.add_argument('state', help="2 letter abbreviation of state (DC and Puerto Rico included) of choice", type=str)
     parser.add_argument('var', help="Find a variable from the ACS 5-year detailed tables and enter the variable"+
                                 " code (i.e. B19013_001E). If you want multiple variables separate by a comma with NO SPACE.")
-    #add optional argument to change var columns to variable name of their choice
+    parser.add_argument('name', help="include key words in place of the variable code to make file name more "+ 
+                                        "understandable- write in same format as var argument", type=str)
     parser.add_argument('--overwrite', help="overwrite raw file or save as new file", action='store_true')
     args, unknown = parser.parse_known_args()
     if args.state.upper() not in states:
         print('Abbreviation is invalid')
         exit(0)
+    args.var.replace(' ', '')
     response = requests.get(f"https://api.census.gov/data/2019/acs/acs5?get=NAME,GEO_ID,{args.var}&for=block%20group:*&in=state:{states[args.state.upper()]}&in=county:*&in=tract:*&key={api_key}")
     if response.status_code == 400:
         print('Status Code 400- request failed')
     result = json.loads(response.text)
     #write function that saves the data into a data folder, creates one smaller folder for each state
-    #change the names of the CSVs from 'income' to something more general (or args.var?)
-    pd.DataFrame(result).to_csv(f'{args.state.upper()}_bg.csv')
-    df = pd.read_csv(f'{args.state.upper()}_bg.csv')
-    df = clean(df)
-    if args.overwrite:
-        df.to_csv(f'{args.state.upper()}_bg.csv', index=False)
+    args.name.replace(',', '_')
+    if args.name is not None:
+        pd.DataFrame(result).to_csv(f'{args.state.upper()}_{args.name}_bg.csv')
+        df = pd.read_csv(f'{args.state.upper()}_{args.name}_bg.csv')
     else:
-        df.to_csv(f'{args.state.upper()}_bg_clean.csv', index=False)
+        pd.DataFrame(result).to_csv(f'{args.state.upper()}_bg.csv')
+        df = pd.read_csv(f'{args.state.upper()}_bg.csv')
+    df = clean(df)
+    if args.name is not None:
+        if args.overwrite:
+            df.to_csv(f'{args.state.upper()}_{args.name}_bg.csv', index=False)
+        else:
+            df.to_csv(f'{args.state.upper()}_{args.name}_bg_clean.csv', index=False)
+    else:
+        if args.overwrite:
+            df.to_csv(f'{args.state.upper()}_bg.csv', index=False)
+        else:
+            df.to_csv(f'{args.state.upper()}_bg_clean.csv', index=False)
 
 if __name__ == '__main__':
     main()
