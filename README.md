@@ -15,7 +15,7 @@ the command for this is "cd <your_directory_path>"
   
 At this time the script takes three arguments: state, var, and overwrite, the latter being optional and the first two being positional(required). An optional argument means that you can choose if you want to include the argument or not.
   
-Enter in the command terminal "python census_api_bg.py -h" the -h can be substituted with -help, which is the command that will show the list of arguments and what each argument entails. See the screenshot below for the descriptions of each argument.
+Enter in the command terminal "python census_api_bg.py -h" (the -h can be substituted with --help) which is the command that will show the list of arguments and what each argument entails. See the screenshot below for the descriptions of each argument.
   
   For state, you will need to input the two-letter abbreviation of the state of your choosing (i.e. 'VA' for Virginia). It also supports Washington DC ('DC') and Puerto Rico.
   
