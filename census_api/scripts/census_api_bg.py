@@ -42,7 +42,7 @@ def main():
     name = args.name.replace(",", "_")
     state = args.state.lower()
     current_path = os.getcwd()
-    data_path = os.path.join(current_path, r'states')
+    data_path = os.path.join(current_path, r'states_data')
     if not os.path.exists(data_path):
         os.makedirs(data_path)
     state_path = os.path.join(data_path, fr'{state}')
