@@ -2,6 +2,7 @@ import requests
 import json
 import pandas as pd
 from argparse import ArgumentParser
+import os
 from config import api_key
 from states import states
 
@@ -27,8 +28,8 @@ def main():
     parser.add_argument('state', help="2 letter abbreviation of state (DC and Puerto Rico included) of choice", type=str)
     parser.add_argument('var', help="Find a variable from the ACS 5-year detailed tables and enter the variable"+
                                 " code (i.e. B19013_001E). If you want multiple variables separate by a comma with NO SPACE.")
-    parser.add_argument('name', help="include key words in place of the variable code to make file name more "+ 
-                                        "understandable- write in same format as var argument", type=str)
+    parser.add_argument('--name', help="include key words in place (such as variable) to make file name more "+ 
+                                        "understandable", type=str)
     parser.add_argument('--overwrite', help="overwrite raw file or save as new file", action='store_true')
     args, unknown = parser.parse_known_args()
     if args.state.upper() not in states:
@@ -39,25 +40,35 @@ def main():
     if response.status_code == 400:
         print('Status Code 400- request failed')
     result = json.loads(response.text)
-    #write function that saves the data into a data folder, creates one smaller folder for each state
-    args.name.replace(',', '_')
     if args.name is not None:
-        pd.DataFrame(result).to_csv(f'{args.state.upper()}_{args.name}_bg.csv')
-        df = pd.read_csv(f'{args.state.upper()}_{args.name}_bg.csv')
+        args.name.replace(',', '_')
+        args.name.replace(' ', '_')
+    state = args.state.lower()
+    name = args.name
+    current_path = os.getcwd()
+    new_path = os.path.join(current_path, fr'{state}')
+    if not os.path.exists(new_path):
+        os.makedirs(new_path)
+    os.chdir(new_path)
+    #save raw
+    if args.name is not None:
+        pd.DataFrame(result).to_csv(fr'{state}_{name}_acs.csv')
+        df = pd.read_csv(fr'{state}_{name}_acs.csv')
     else:
-        pd.DataFrame(result).to_csv(f'{args.state.upper()}_bg.csv')
-        df = pd.read_csv(f'{args.state.upper()}_bg.csv')
+        pd.DataFrame(result).to_csv(fr'{state}_acs.csv')
+        df = pd.read_csv(fr'{state}_acs.csv')
     df = clean(df)
+    #save clean
     if args.name is not None:
         if args.overwrite:
-            df.to_csv(f'{args.state.upper()}_{args.name}_bg.csv', index=False)
+            df.to_csv(fr'{state}_{name}_acs.csv', index=False)
         else:
-            df.to_csv(f'{args.state.upper()}_{args.name}_bg_clean.csv', index=False)
+            df.to_csv(fr'{state}_{name}_acs_clean.csv', index=False)
     else:
         if args.overwrite:
-            df.to_csv(f'{args.state.upper()}_bg.csv', index=False)
+            df.to_csv(fr'{state}_acs.csv', index=False)
         else:
-            df.to_csv(f'{args.state.upper()}_bg_clean.csv', index=False)
+            df.to_csv(fr'{state}_acs_clean.csv', index=False)
 
 if __name__ == '__main__':
     main()
