@@ -39,7 +39,8 @@ def main():
     if response.status_code == 400:
         print('Status Code 400- request failed')
     result = json.loads(response.text)
-    name = args.name.replace(",", "_")
+    if args.name is not None:
+        name = args.name.replace(",", "_")
     state = args.state.lower()
     current_path = os.getcwd()
     data_path = os.path.join(current_path, r'states_data')
