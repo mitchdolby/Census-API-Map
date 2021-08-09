@@ -29,7 +29,7 @@ def main():
     parser.add_argument('var', help="Find a variable from the ACS 5-year detailed tables and enter the variable"+
                                 " code (i.e. B19013_001E). If you want multiple variables separate by a comma with NO SPACE.")
     parser.add_argument('--name', help="include key words in place (such as variable) to make file name more "+ 
-                                        "understandable", type=str)
+                                        "understandable. Write in the same format as the --var argument", type=str)
     parser.add_argument('--overwrite', help="overwrite raw file or save as new file", action='store_true')
     args, unknown = parser.parse_known_args()
     if args.state.upper() not in states:
@@ -40,16 +40,17 @@ def main():
     if response.status_code == 400:
         print('Status Code 400- request failed')
     result = json.loads(response.text)
-    if args.name is not None:
-        args.name.replace(',', '_')
-        args.name.replace(' ', '_')
+    name = args.name.replace(",", "_")
+    print(name)
     state = args.state.lower()
-    name = args.name
     current_path = os.getcwd()
-    new_path = os.path.join(current_path, fr'{state}')
-    if not os.path.exists(new_path):
-        os.makedirs(new_path)
-    os.chdir(new_path)
+    data_path = os.path.join(current_path, r'states')
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+    state_path = os.path.join(data_path, fr'{state}')
+    if not os.path.exists(state_path):
+        os.makedirs(state_path)
+    os.chdir(state_path)
     #save raw
     if args.name is not None:
         pd.DataFrame(result).to_csv(fr'{state}_{name}_acs.csv')
